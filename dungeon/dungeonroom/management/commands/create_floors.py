@@ -130,6 +130,9 @@ CONNECTION_RATE = 0.9
 class Command(BaseCommand):
     def handle(self, *args, **options):
 
+        Room.objects.all().delete()
+        Floor.objects.all().delete()
+
         floor = Floor(name=f'1st Floor', level=0, num_rooms=0)
         floor.save()
         total_rooms = 0
@@ -154,6 +157,8 @@ class Command(BaseCommand):
                     if y + 1 < MAX_Y and Room.objects.filter(pos_x=x, pos_y=y+1).first() and random.random() <= CONNECTION_RATE:
                         room.connection_north = Room.objects.get(pos_x=x, pos_y=y+1)
                         room.connections += 1
+                        Room.objects.get(pos_x=x, pos_y=y+1).first().connection_south = room
+                        Room.objects.get(pos_x=x, pos_y=y+1).first().connections += 1
                         room.save()
                     # Try to connect south, if you are not at the bottom of the map and there is a room below
                     if y - 1 >= 0 and Room.objects.filter(pos_x=x, pos_y=y-1).first() and random.random() <= CONNECTION_RATE:
